@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "984287265731",
+    "firebase_url": "https://tasks-25357.firebaseio.com",
+    "project_id": "tasks-25357",
+    "storage_bucket": "tasks-25357.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984287265731:android:569f2e515ccd9072",
+        "android_client_info": {
+          "package_name": "nl.koenhabets.tasks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984287265731-e0prs68m7srmn0gha64n5h4dg8crun3o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwepB3G37Av5j3YWW05yzF8Fow9E877ho"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
