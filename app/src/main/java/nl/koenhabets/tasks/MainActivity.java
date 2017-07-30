@@ -33,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
