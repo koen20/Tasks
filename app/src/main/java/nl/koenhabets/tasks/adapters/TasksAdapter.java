@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import nl.koenhabets.tasks.R;
@@ -25,6 +27,7 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
 
         String subject = taskItem.getSubject();
         boolean isCompleted = taskItem.isCompleted();
+        long ts = taskItem.getDate();
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_item, parent, false);
@@ -32,6 +35,11 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
 
         TextView textViewContent = (TextView) convertView.findViewById(R.id.textViewSubject);
         final CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+        TextView textViewDate = (TextView) convertView.findViewById(R.id.textViewDate);
+
+        Date d = new Date(ts * 1000);
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd hh:mm");
+        textViewDate.setText(dt.format(d));
 
         textViewContent.setText(subject);
         checkBox.setChecked(isCompleted);

@@ -4,38 +4,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.koenhabets.tasks.AddTaskActivity;
+import nl.koenhabets.tasks.Api;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TaskItem;
 import nl.koenhabets.tasks.adapters.TasksAdapter;
 
-public class TasksFragment extends Fragment {
+public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.NoticeDialogListener {
     ListView listView;
     private List<TaskItem> taskItems = new ArrayList<>();
     private TasksAdapter adapter;
+    int positionL;
 
     public TasksFragment() {
     }
@@ -50,24 +41,12 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
+        taskItems = Api.getTaskItems(getContext());
 
         adapter = new TasksAdapter(getContext(), taskItems);
         listView = (ListView) rootView.findViewById(R.id.tasksListview);
         listView.setAdapter(adapter);
 
-        taskItems.clear();
-        Gson parser = new Gson();
-
-        try {
-            JSONArray array = new JSONArray(readFromFile(getContext()));
-            for (int i = 0;i < array.length() ;i++){
-                JSONObject object = new JSONObject(array.get(i).toString());
-                TaskItem item = new TaskItem(object.getString("subject"), "", 0, false);
-                taskItems.add(item);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         adapter.notifyDataSetChanged();
 
@@ -81,69 +60,45 @@ public class TasksFragment extends Fragment {
             }
         });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id) {
+                positionL = pos;
+                //DialogFragment newFragment = new RemoveTaskDialogFragment();
+                //newFragment.show(getFragmentManager(), "Task");
+                taskItems.remove(positionL);
+                Api.update(taskItems, getContext());
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+
         return rootView;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-
-        //if( requestCode == 989 ) {
         String subject = null;
+        long ts = 0;
         try {
             subject = data.getStringExtra("subject");
+            ts = data.getLongExtra("date", 0);
             Log.i("subject", subject);
         } catch (NullPointerException ignored) {
         }
         if (subject != null) {
-            TaskItem item = new TaskItem(subject, "", 0, false);
+            TaskItem item = new TaskItem(subject, ts, 0, false);
             taskItems.add(item);
-            Gson parser = new Gson();
-            Log.i("json", parser.toJson(taskItems) + "");
-            writeToFile(parser.toJson(taskItems), getContext());
+            Api.update(taskItems, getContext());
             adapter.notifyDataSetChanged();
         }
-        //}
     }
 
-    private void writeToFile(String data,Context context) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("tasks", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-    }
-
-    private String readFromFile(Context context) {
-
-        String ret = "";
-
-        try {
-            InputStream inputStream = context.openFileInput("tasks");
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
+    @Override
+    public void onDialogRemoveClick(DialogFragment dialog) {
+        taskItems.remove(positionL);
+        Api.update(taskItems, getContext());
+        adapter.notifyDataSetChanged();
     }
 }

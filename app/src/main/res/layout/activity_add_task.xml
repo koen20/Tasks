@@ -28,13 +28,28 @@
         tools:layout_editor_absoluteY="77dp" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/editTextDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/editText"
         android:layout_below="@+id/textView2"
+        android:clickable="true"
+        android:editable="false"
         android:ems="10"
+        android:focusable="false"
         android:hint="Date"
         android:inputType="date" />
+
+    <EditText
+        android:id="@+id/editTextTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editTextDate"
+        android:layout_toEndOf="@+id/editText"
+        android:clickable="true"
+        android:editable="false"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="Time"
+        android:inputType="textPersonName" />
 
 </RelativeLayout>

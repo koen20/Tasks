@@ -3,11 +3,11 @@ package nl.koenhabets.tasks;
 
 public class TaskItem {
     private String subject;
-    private String date;
+    private long date;
     private int priority;
     private boolean completed;
 
-    public TaskItem(String subject, String date, int priority, boolean completed) {
+    public TaskItem(String subject, long date, int priority, boolean completed) {
         this.subject = subject;
         this.date = date;
         this.priority = priority;
@@ -18,7 +18,7 @@ public class TaskItem {
         return subject;
     }
 
-    public String getDate() {
+    public long getDate() {
         return date;
     }
 
