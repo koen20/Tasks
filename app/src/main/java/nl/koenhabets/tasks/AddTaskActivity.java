@@ -103,6 +103,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
         if (id == R.id.action_add) {
             int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
+            Log.i("index", index + "");
             Intent returnIntent = new Intent();
             returnIntent.putExtra("subject", subject.getText().toString());
             returnIntent.putExtra("date", ts);

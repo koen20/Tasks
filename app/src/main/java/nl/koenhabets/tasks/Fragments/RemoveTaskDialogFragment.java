@@ -6,23 +6,35 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+
+import nl.koenhabets.tasks.TaskItem;
 
 public class RemoveTaskDialogFragment extends DialogFragment {
-    public interface NoticeDialogListener {
-        public void onDialogRemoveClick(android.support.v4.app.DialogFragment dialog);
+    private String task;
+
+    static RemoveTaskDialogFragment newInstance(String task) {
+        RemoveTaskDialogFragment f = new RemoveTaskDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("Task", task);
+        f.setArguments(args);
+
+        return f;
     }
 
-    NoticeDialogListener mListener;
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (NoticeDialogListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement NoticeDialogListener");
-        }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        task = getArguments().getString("Task");
     }
 
     @Override
@@ -31,7 +43,34 @@ public class RemoveTaskDialogFragment extends DialogFragment {
         builder.setTitle("Remove task")
                 .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogRemoveClick(RemoveTaskDialogFragment.this);
+                        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                        String userId = currentFirebaseUser.getUid();
+                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                        database.child("users").child(userId).child("items").equalTo("subject");
+                        Query queryRef = database.child("users").child(userId).child("items").orderByChild("id").equalTo(task);
+
+                        queryRef.addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
+                                snapshot.getRef().setValue(null);
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
