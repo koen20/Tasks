@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
@@ -22,6 +23,7 @@ public class AddTaskActivity extends AppCompatActivity {
     EditText subject;
     EditText editTextdate;
     EditText editTextTime;
+    RadioGroup radioGroup;
     private int year;
     private int month;
     private int day;
@@ -36,6 +38,7 @@ public class AddTaskActivity extends AppCompatActivity {
         subject = (EditText) findViewById(R.id.editText);
         editTextdate = (EditText) findViewById(R.id.editTextDate);
         editTextTime = (EditText) findViewById(R.id.editTextTime);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -99,9 +102,11 @@ public class AddTaskActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_add) {
+            int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
             Intent returnIntent = new Intent();
             returnIntent.putExtra("subject", subject.getText().toString());
             returnIntent.putExtra("date", ts);
+            returnIntent.putExtra("priority", index);
             setResult(Activity.RESULT_OK, returnIntent);
             finish();
             return true;

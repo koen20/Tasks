@@ -39,9 +39,9 @@ public class DrawerActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser == null){
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

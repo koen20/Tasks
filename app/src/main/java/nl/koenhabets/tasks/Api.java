@@ -2,8 +2,18 @@ package nl.koenhabets.tasks;
 
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -44,8 +54,8 @@ public class Api {
             array.remove(array.length() - 1);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = new JSONObject(array.get(i).toString());
-                TaskItem item = new TaskItem(object.getString("subject"), object.getLong("date"), 0, false);
-                taskItems.add(item);
+                //TaskItem item = new TaskItem(object.getString("subject"), object.getLong("date"), 0, object.getBoolean("completed"));
+                //taskItems.add(item);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -90,5 +100,32 @@ public class Api {
         }
 
         return ret;
+    }
+
+    public static void getData(final Context context){
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUser.getToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            Log.i("idToken", idToken);
+                            RequestQueue requestQueue = Volley.newRequestQueue(context);
+                            final GetTasks request = new GetTasks(idToken, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.i("response", response);
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("getData", error + "");
+                                }
+                            });
+                            requestQueue.add(request);
+                        } else {
+                        }
+                    }
+                });
     }
 }
