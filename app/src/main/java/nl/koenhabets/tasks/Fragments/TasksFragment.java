@@ -27,12 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.koenhabets.tasks.AddTaskActivity;
-import nl.koenhabets.tasks.Api;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TaskItem;
 import nl.koenhabets.tasks.adapters.TasksAdapter;
 
-public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.NoticeDialogListener {
+public class TasksFragment extends Fragment {
     ListView listView;
     private List<TaskItem> taskItems = new ArrayList<>();
     private TasksAdapter adapter;
@@ -73,13 +72,21 @@ public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.
                     String subject = (String) snap.child("subject").getValue();
                     String id = (String) snap.child("id").getValue();
                     boolean completed = false;
-                    long priority = (long) snap.child("priority").getValue();
-                    Log.i("asidfoj", priority + "");
-                    long date = (long) snap.child("date").getValue();
+                    long priority;
+                    long date;
                     try {
                         completed = (Boolean) snap.child("completed").getValue();
                     } catch (NullPointerException ignored) {
-
+                    }
+                    try {
+                        priority = (long) snap.child("priority").getValue();
+                    } catch (NullPointerException ignored) {
+                        priority = 1;
+                    }
+                    try {
+                        date = (long) snap.child("date").getValue();
+                    } catch (NullPointerException ignored) {
+                        date = 0;
                     }
                     TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
                     taskItems.add(item);
@@ -110,8 +117,8 @@ public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
                                            int pos, long id) {
                 positionL = pos;
-                TaskItem item = taskItems.get(pos);
-                removeItem(item);
+                DialogFragment newFragment = RemoveTaskDialogFragment.newInstance(taskItems.get(pos).getId());
+                newFragment.show(getFragmentManager(), "Task");
                 return true;
             }
         });
@@ -123,11 +130,11 @@ public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         String subject = null;
         long ts = 0;
-        int priority = 2;
+        int priority = 1;
         try {
             subject = data.getStringExtra("subject");
             ts = data.getLongExtra("date", 0);
-            priority = data.getIntExtra("priority", 2);
+            priority = data.getIntExtra("priority", 1);
         } catch (NullPointerException ignored) {
         }
         if (subject != null) {
@@ -140,43 +147,5 @@ public class TasksFragment extends Fragment implements RemoveTaskDialogFragment.
             taskItems.add(item);
             adapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void onDialogRemoveClick(DialogFragment dialog) {
-        taskItems.remove(positionL);
-        //Api.update(taskItems, getContext());
-        adapter.notifyDataSetChanged();
-    }
-
-    private void removeItem(TaskItem item) {
-        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = currentFirebaseUser.getUid();
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        database.child("users").child(userId).child("items").equalTo("subject");
-        Query queryRef = database.child("users").child(userId).child("items").orderByChild("id").equalTo(item.getId());
-
-        queryRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
-                snapshot.getRef().setValue(null);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
     }
 }
