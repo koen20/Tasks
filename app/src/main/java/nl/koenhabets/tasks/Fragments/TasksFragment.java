@@ -53,8 +53,6 @@ public class TasksFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
         //taskItems = Api.getTaskItems(getContext());
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         adapter = new TasksAdapter(getContext(), taskItems);
         listView = (ListView) rootView.findViewById(R.id.tasksListview);
         listView.setAdapter(adapter);
@@ -120,6 +118,18 @@ public class TasksFragment extends Fragment {
                 DialogFragment newFragment = RemoveTaskDialogFragment.newInstance(taskItems.get(pos).getId());
                 newFragment.show(getFragmentManager(), "Task");
                 return true;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                Intent intent = new Intent(getActivity(), AddTaskActivity.class);
+                intent.putExtra("subject", taskItems.get(pos).getSubject());
+                intent.putExtra("date", taskItems.get(pos).getDate());
+                intent.putExtra("priority", taskItems.get(pos).getPriority());
+                intent.putExtra("id", taskItems.get(pos).getId());
+                startActivityForResult(intent, 989);
             }
         });
 

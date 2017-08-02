@@ -17,10 +17,21 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+
 import java.util.Calendar;
+import java.util.Objects;
 
 public class AddTaskActivity extends AppCompatActivity {
-    EditText subject;
+    EditText editTextSubject;
     EditText editTextdate;
     EditText editTextTime;
     RadioGroup radioGroup;
@@ -30,15 +41,30 @@ public class AddTaskActivity extends AppCompatActivity {
     private int hour;
     private int minute;
     private long ts;
+    String subject;
+    long date;
+    int priority;
+    String id;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
-        subject = (EditText) findViewById(R.id.editText);
+
+        Intent intent = getIntent();
+        subject = intent.getStringExtra("subject");
+        date = intent.getLongExtra("date", 0);
+        priority = intent.getIntExtra("priority", 1);
+        id = intent.getStringExtra("id");
+
+        editTextSubject = (EditText) findViewById(R.id.editText);
         editTextdate = (EditText) findViewById(R.id.editTextDate);
         editTextTime = (EditText) findViewById(R.id.editTextTime);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+
+        editTextSubject.setText(subject);
+        radioGroup.check(priority);
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -99,24 +125,37 @@ public class AddTaskActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        int idd = item.getItemId();
+        int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
+        if (idd == R.id.action_add && id == null) {
 
-        if (id == R.id.action_add) {
-            int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
             Log.i("index", index + "");
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("subject", subject.getText().toString());
+            returnIntent.putExtra("subject", editTextSubject.getText().toString());
             returnIntent.putExtra("date", ts);
             returnIntent.putExtra("priority", index);
             setResult(Activity.RESULT_OK, returnIntent);
             finish();
             return true;
+        } else if (id != null) {
+            FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            String userId = currentFirebaseUser.getUid();
+            //DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+            //database.child("users").child(userId).child("items").equalTo("subject");
+            //Query queryRef = database.child("users").child(userId).child("items").orderByChild("id").equalTo(id);
+
+            DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("items").child(id);
+            database.child("subject").setValue(editTextSubject.getText().toString());
+            database.child("priority").setValue(index);
+            database.child("date").setValue(ts);
+            finish();
         }
+
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void ts(){
+    private void ts() {
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day, hour, minute);
         ts = cal.getTimeInMillis() / 1000;
