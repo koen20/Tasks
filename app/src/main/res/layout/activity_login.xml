@@ -29,7 +29,7 @@
         android:visibility="invisible"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="16dp"
-        android:text="@string/email"
+        android:hint="@string/email"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
