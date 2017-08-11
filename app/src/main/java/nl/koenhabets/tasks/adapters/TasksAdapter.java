@@ -20,15 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import nl.koenhabets.tasks.Api;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TaskItem;
 
@@ -54,9 +49,12 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         final CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
         TextView textViewDate = (TextView) convertView.findViewById(R.id.textViewDate);
 
-        Date d = new Date(ts * 1000);
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-mm-dd hh:mm");
-        textViewDate.setText(dt.format(d));
+        if(ts != 0) {
+            Date d = new Date(ts);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(d);
+            textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
+        }
 
         textViewSubject.setText(subject);
         checkBox.setChecked(isCompleted);

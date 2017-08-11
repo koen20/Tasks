@@ -14,21 +14,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 import java.util.Calendar;
-import java.util.Objects;
+import java.util.Date;
 
 public class AddTaskActivity extends AppCompatActivity {
     EditText editTextSubject;
@@ -45,6 +41,9 @@ public class AddTaskActivity extends AppCompatActivity {
     long date;
     int priority;
     String id;
+    RadioButton radioLow;
+    RadioButton radioMedium;
+    RadioButton radioHigh;
 
 
     @Override
@@ -63,8 +62,27 @@ public class AddTaskActivity extends AppCompatActivity {
         editTextTime = (EditText) findViewById(R.id.editTextTime);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
+        radioLow = (RadioButton) findViewById(R.id.radioLow);
+        radioMedium = (RadioButton) findViewById(R.id.radioMedium);
+        radioHigh = (RadioButton) findViewById(R.id.radioHigh);
+
+        if(priority == 0){
+            radioLow.setChecked(true);
+        } else if (priority == 1){
+            radioMedium.setChecked(true);
+        } else if (priority == 2){
+            radioHigh.setChecked(true);
+        }
+
+        if(date != 0){
+            Date d = new Date(date);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(d);
+            editTextdate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + " " + cal.get(Calendar.YEAR));
+            editTextTime.setText(cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
+        }
+
         editTextSubject.setText(subject);
-        radioGroup.check(priority);
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -110,7 +128,7 @@ public class AddTaskActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Calendar cal = Calendar.getInstance();
                 new TimePickerDialog(AddTaskActivity.this, time, cal
-                        .get(Calendar.YEAR), cal.get(Calendar.MONTH),
+                        .get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
                         true).show();
             }
 
@@ -158,6 +176,6 @@ public class AddTaskActivity extends AppCompatActivity {
     private void ts() {
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day, hour, minute);
-        ts = cal.getTimeInMillis() / 1000;
+        ts = cal.getTimeInMillis();
     }
 }

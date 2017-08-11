@@ -22,7 +22,7 @@
         <activity
             android:name=".LoginActivity"
             android:theme="@style/Login" />
-        <activity android:name=".AddTaskActivity"></activity>
+        <activity android:name=".AddTaskActivity" />
     </application>
 
 </manifest>

@@ -21,7 +21,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/checkBox"
-        android:text="" />
+        android:text=""
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/textViewDate"
