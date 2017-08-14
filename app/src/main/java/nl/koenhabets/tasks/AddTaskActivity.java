@@ -90,7 +90,7 @@ public class AddTaskActivity extends AppCompatActivity {
             public void onDateSet(DatePicker view, int ye, int mo,
                                   int da) {
                 year = ye;
-                month = mo;
+                month = mo + 1;
                 day = da;
                 editTextdate.setText(day + "-" + month + " " + year);
                 ts();

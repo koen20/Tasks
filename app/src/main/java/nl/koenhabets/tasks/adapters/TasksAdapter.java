@@ -52,14 +52,16 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         if(ts != 0) {
             Date d = new Date(ts);
             Calendar cal = Calendar.getInstance();
+            long da = cal.getTimeInMillis();
             cal.setTime(d);
             textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
+            if(da > ts) {
+                textViewDate.setTextColor(Color.parseColor("#F44336"));
+            }
         }
 
         textViewSubject.setText(subject);
         checkBox.setChecked(isCompleted);
-
-        Log.i("pri", taskItem.getPriority() + "");
 
         if (taskItem.getPriority() == 0){
             textViewSubject.setTextColor(Color.parseColor("#757575"));
