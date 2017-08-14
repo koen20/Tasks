@@ -27,31 +27,49 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 
 public class LoginActivity extends AppCompatActivity {
-    Button button;
-    Button buttonLogin;
-    Button buttonLogin2;
-    Button buttonRegister2;
-    ImageView image;
+    Button buttonBaseLogin;
+    Button buttonBaseRegister;
 
-    EditText editTextEmail;
-    EditText editTextPassword;
+    EditText textEmailLogin;
+    EditText textPasswordLogin;
+    Button buttonLoginAccount;
+
+    EditText textEmailRegister;
+    EditText textPasswordRegister;
+    Button buttonRegisterAccount;
+
+    View contentLoginAccount;
+    View contentRegisterAccount;
+    View contentBase;
+
     private FirebaseAuth mAuth;
     boolean thing = false;
     GoogleApiClient mGoogleApiClient;
+    SignInButton signInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
-        button = (Button) findViewById(R.id.button);
-        buttonLogin = (Button) findViewById(R.id.button2);
-        buttonLogin2 = (Button) findViewById(R.id.button3);
-        buttonRegister2 = (Button) findViewById(R.id.button4);
-        image = (ImageView) findViewById(R.id.imageView3);
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        contentLoginAccount = (View) findViewById(R.id.content_login_account);
+        contentRegisterAccount = (View) findViewById(R.id.content_register_account);
+        contentBase = (View) findViewById(R.id.content_login_base);
+
+        contentLoginAccount.setVisibility(View.INVISIBLE);
+        contentRegisterAccount.setVisibility(View.INVISIBLE);
+
+        buttonBaseLogin = findViewById(R.id.buttonLogin);
+        buttonBaseRegister = findViewById(R.id.buttonRegister);
+        signInButton = findViewById(R.id.button7);
+
+        textEmailLogin = findViewById(R.id.textEmailLogin);
+        textPasswordLogin = findViewById(R.id.textPasswordLogin);
+        buttonLoginAccount = findViewById(R.id.buttonLoginAccount);
+
+        textEmailRegister = findViewById(R.id.textEmailRegister);
+        textPasswordRegister = findViewById(R.id.textPasswordRegister);
+        buttonRegisterAccount = findViewById(R.id.buttonRegisterAccount);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -70,35 +88,51 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(signInIntent, 571);
             }
         });
-        buttonLogin2.setOnClickListener(new View.OnClickListener() {
+        buttonBaseLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buttonLogin.setVisibility(View.VISIBLE);
-                editTextEmail.setVisibility(View.VISIBLE);
-                editTextPassword.setVisibility(View.VISIBLE);
-                buttonRegister2.setVisibility(View.INVISIBLE);
-                buttonLogin2.setVisibility(View.INVISIBLE);
-                image.setVisibility(View.INVISIBLE);
+                contentLoginAccount.setVisibility(View.VISIBLE);
+                contentBase.setVisibility(View.INVISIBLE);
                 thing = true;
             }
         });
-        buttonRegister2.setOnClickListener(new View.OnClickListener() {
+        buttonBaseRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                button.setVisibility(View.VISIBLE);
-                editTextEmail.setVisibility(View.VISIBLE);
-                editTextPassword.setVisibility(View.VISIBLE);
-                buttonRegister2.setVisibility(View.INVISIBLE);
-                buttonLogin2.setVisibility(View.INVISIBLE);
-                image.setVisibility(View.INVISIBLE);
+                contentRegisterAccount.setVisibility(View.VISIBLE);
+                contentBase.setVisibility(View.INVISIBLE);
                 thing = true;
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonLoginAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.createUserWithEmailAndPassword(editTextEmail.getText() + "", editTextPassword.getText() + "")
+                mAuth.signInWithEmailAndPassword(textEmailLogin.getText() + "", textPasswordLogin.getText() + "")
+                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Log.d("login", "signInWithEmail:success");
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    Intent intent = new Intent(getApplicationContext(), DrawerActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Log.w("login", "signInWithEmail:failure", task.getException());
+                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        });
+
+        buttonRegisterAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.createUserWithEmailAndPassword(textEmailRegister.getText() + "", textPasswordRegister.getText() + "")
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -120,42 +154,14 @@ public class LoginActivity extends AppCompatActivity {
                         });
             }
         });
-
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signInWithEmailAndPassword(editTextEmail.getText() + "", editTextPassword.getText() + "")
-                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Log.d("login", "signInWithEmail:success");
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    Intent intent = new Intent(getApplicationContext(), DrawerActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    Log.w("login", "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-            }
-        });
     }
 
     @Override
     public void onBackPressed() {
         if (thing) {
-            button.setVisibility(View.INVISIBLE);
-            buttonLogin.setVisibility(View.INVISIBLE);
-            editTextEmail.setVisibility(View.INVISIBLE);
-            editTextPassword.setVisibility(View.INVISIBLE);
-            buttonRegister2.setVisibility(View.VISIBLE);
-            buttonLogin2.setVisibility(View.VISIBLE);
-            image.setVisibility(View.VISIBLE);
+            contentRegisterAccount.setVisibility(View.INVISIBLE);
+            contentLoginAccount.setVisibility(View.INVISIBLE);
+            contentBase.setVisibility(View.VISIBLE);
             thing = false;
         } else {
             super.onBackPressed();

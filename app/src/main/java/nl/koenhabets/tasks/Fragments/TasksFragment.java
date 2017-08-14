@@ -24,6 +24,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import nl.koenhabets.tasks.AddTaskActivity;
@@ -53,6 +55,7 @@ public class TasksFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
         //taskItems = Api.getTaskItems(getContext());
+
         adapter = new TasksAdapter(getContext(), taskItems);
         listView = (ListView) rootView.findViewById(R.id.tasksListview);
         listView.setAdapter(adapter);
@@ -62,7 +65,7 @@ public class TasksFragment extends Fragment {
 
         database = FirebaseDatabase.getInstance().getReference();
 
-        database.child("users").child(userId).child("items").addValueEventListener(new ValueEventListener() {
+        database.child("users").child(userId).child("items").orderByChild("date").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 taskItems.clear();
