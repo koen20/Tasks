@@ -158,10 +158,6 @@ public class AddTaskActivity extends AppCompatActivity {
         } else if (id != null) {
             FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             String userId = currentFirebaseUser.getUid();
-            //DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            //database.child("users").child(userId).child("items").equalTo("subject");
-            //Query queryRef = database.child("users").child(userId).child("items").orderByChild("id").equalTo(id);
-
             DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("items").child(id);
             database.child("subject").setValue(editTextSubject.getText().toString());
             database.child("priority").setValue(index);

@@ -1,6 +1,5 @@
 package nl.koenhabets.tasks.Fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,17 +14,13 @@ import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import nl.koenhabets.tasks.AddTaskActivity;
@@ -40,6 +35,7 @@ public class TasksFragment extends Fragment {
     int positionL;
     DatabaseReference database;
     String userId;
+    boolean showCompleted;
 
     public TasksFragment() {
     }
@@ -54,11 +50,12 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
-        //taskItems = Api.getTaskItems(getContext());
 
         adapter = new TasksAdapter(getContext(), taskItems);
         listView = (ListView) rootView.findViewById(R.id.tasksListview);
         listView.setAdapter(adapter);
+
+        showCompleted = getArguments().getBoolean("showCompleted");
 
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = currentFirebaseUser.getUid();
@@ -89,8 +86,14 @@ public class TasksFragment extends Fragment {
                     } catch (NullPointerException ignored) {
                         date = 0;
                     }
-                    TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
-                    taskItems.add(item);
+
+                    if (showCompleted && completed) {
+                        TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
+                        taskItems.add(item);
+                    } else if (!showCompleted && !completed) {
+                        TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
+                        taskItems.add(item);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }
