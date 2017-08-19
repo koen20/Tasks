@@ -141,10 +141,12 @@ public class TasksFragment extends Fragment {
         String subject = null;
         long ts = 0;
         int priority = 1;
+        String tags = "";
         try {
             subject = data.getStringExtra("subject");
             ts = data.getLongExtra("date", 0);
             priority = data.getIntExtra("priority", 1);
+            tags = data.getStringExtra("tags");
         } catch (NullPointerException ignored) {
         }
         if (subject != null) {
@@ -153,6 +155,8 @@ public class TasksFragment extends Fragment {
             datas.child("date").setValue(ts);
             datas.child("id").setValue(datas.getKey());
             datas.child("priority").setValue(priority);
+            datas.child("tags").setValue(tags);
+
             TaskItem item = new TaskItem(subject, ts, priority, false, datas.getKey());
             taskItems.add(item);
             adapter.notifyDataSetChanged();

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="nl.koenhabets.tasks.AddTaskActivity">
 
     <EditText
@@ -21,47 +21,47 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10pt"
-        android:text="@string/priority"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="77dp"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/editText"
-        android:layout_alignParentStart="true" />
+        android:text="@string/priority"
+        android:textSize="10pt"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="77dp" />
 
     <EditText
         android:id="@+id/editTextDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/radioGroup"
+        android:layout_toStartOf="@+id/editTextTime"
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
         android:hint="@string/date"
-        android:inputType="date"
-        android:layout_below="@+id/radioGroup"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/editTextTime" />
+        android:inputType="date" />
 
     <EditText
         android:id="@+id/editTextTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editTextDate"
+        android:layout_alignBottom="@+id/editTextDate"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/radioGroup"
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
         android:hint="@string/time"
-        android:inputType="textPersonName"
-        android:layout_alignBaseline="@+id/editTextDate"
-        android:layout_alignBottom="@+id/editTextDate"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/radioGroup" />
+        android:inputType="textPersonName" />
 
     <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation='horizontal'
-        android:id="@+id/radioGroup"
+        android:layout_alignEnd="@+id/editText"
         android:layout_below="@+id/editText"
-        android:layout_alignEnd="@+id/editText">
+        android:orientation='horizontal'>
 
         <android.support.v7.widget.AppCompatRadioButton
             android:id="@+id/radioLow"
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:text=""
-            app:buttonTint="#757575"/>
+            app:buttonTint="#757575" />
 
         <android.support.v7.widget.AppCompatRadioButton
             android:id="@+id/radioMedium"
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:text=""
-            app:buttonTint="#FB8C00"/>
+            app:buttonTint="#FB8C00" />
 
         <android.support.v7.widget.AppCompatRadioButton
             android:id="@+id/radioHigh"
@@ -85,17 +85,16 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:text=""
-            app:buttonTint="#F44336"/>
+            app:buttonTint="#F44336" />
     </RadioGroup>
 
-    <AutoCompleteTextView
+    <MultiAutoCompleteTextView
         android:id="@+id/autoCompleteTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/editTextDate"
+        android:layout_toStartOf="@+id/editTextTime"
         android:hint="@string/tags"
-        android:text=""
-        android:layout_toStartOf="@+id/editTextTime" />
-
+        android:text="" />
 </RelativeLayout>

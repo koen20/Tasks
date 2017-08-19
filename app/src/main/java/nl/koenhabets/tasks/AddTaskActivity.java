@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
@@ -38,7 +39,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private EditText editTextdate;
     private EditText editTextTime;
     private RadioGroup radioGroup;
-    private AutoCompleteTextView actv;
+    private MultiAutoCompleteTextView actv;
     private int year;
     private int month;
     private int day;
@@ -53,6 +54,8 @@ public class AddTaskActivity extends AppCompatActivity {
     private RadioButton radioMedium;
     private RadioButton radioHigh;
     private DatabaseReference database;
+    private List<String> tags = new ArrayList<>();
+    String userId;
 
 
     @Override
@@ -78,9 +81,8 @@ public class AddTaskActivity extends AppCompatActivity {
         radioHigh = findViewById(R.id.radioHigh);
 
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = currentFirebaseUser.getUid();
+        userId = currentFirebaseUser.getUid();
         database = FirebaseDatabase.getInstance().getReference();
-        final List<String> tags = new ArrayList<>();
         database.child("users").child(userId).child("tags").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -99,6 +101,7 @@ public class AddTaskActivity extends AppCompatActivity {
         TagAdapter adapter = new TagAdapter(this, tags);
         actv.setAdapter(adapter);
         actv.setThreshold(1);
+        actv.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
         if (priority == 0) {
             radioLow.setChecked(true);
@@ -180,13 +183,26 @@ public class AddTaskActivity extends AppCompatActivity {
         int idd = item.getItemId();
         int index = radioGroup.indexOfChild(findViewById(radioGroup.getCheckedRadioButtonId()));
         if (idd == R.id.action_add && id == null) {
-
-            Log.i("index", index + "");
             Intent returnIntent = new Intent();
             returnIntent.putExtra("subject", editTextSubject.getText().toString());
             returnIntent.putExtra("date", ts);
             returnIntent.putExtra("priority", index);
             setResult(Activity.RESULT_OK, returnIntent);
+            String tex = actv.getText() + "";
+            String[] tagsSplit = tex.split(",");
+            for (int i = 0; i < tagsSplit.length; ++i){
+                boolean ads = false;
+                for(String te : tags){
+                    if(te.contains(tagsSplit[i])){
+                        ads = true;
+                    }
+                }
+                if(!ads){
+                    DatabaseReference datas = database.child("users").child(userId).child("tags").push();
+                    datas.child("name").setValue(tagsSplit[i].trim());
+                }
+            }
+            returnIntent.putExtra("tags", tex);
             finish();
             return true;
         } else if (id != null) {
@@ -198,7 +214,6 @@ public class AddTaskActivity extends AppCompatActivity {
             database.child("date").setValue(ts);
             finish();
         }
-
 
         return super.onOptionsItemSelected(item);
     }
