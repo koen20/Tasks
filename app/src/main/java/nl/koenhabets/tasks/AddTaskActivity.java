@@ -4,7 +4,6 @@ package nl.koenhabets.tasks;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -20,30 +20,39 @@ import android.widget.TimePicker;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import nl.koenhabets.tasks.adapters.TagAdapter;
 
 public class AddTaskActivity extends AppCompatActivity {
-    EditText editTextSubject;
-    EditText editTextdate;
-    EditText editTextTime;
-    RadioGroup radioGroup;
+    private EditText editTextSubject;
+    private EditText editTextdate;
+    private EditText editTextTime;
+    private RadioGroup radioGroup;
+    private AutoCompleteTextView actv;
     private int year;
     private int month;
     private int day;
     private int hour;
     private int minute;
     private long ts;
-    String subject;
-    long date;
-    int priority;
-    String id;
-    RadioButton radioLow;
-    RadioButton radioMedium;
-    RadioButton radioHigh;
+    private String subject;
+    private long date;
+    private int priority;
+    private String id;
+    private RadioButton radioLow;
+    private RadioButton radioMedium;
+    private RadioButton radioHigh;
+    private DatabaseReference database;
 
 
     @Override
@@ -57,24 +66,49 @@ public class AddTaskActivity extends AppCompatActivity {
         priority = intent.getIntExtra("priority", 1);
         id = intent.getStringExtra("id");
 
-        editTextSubject = (EditText) findViewById(R.id.editText);
-        editTextdate = (EditText) findViewById(R.id.editTextDate);
-        editTextTime = (EditText) findViewById(R.id.editTextTime);
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
-        radioLow = (RadioButton) findViewById(R.id.radioLow);
-        radioMedium = (RadioButton) findViewById(R.id.radioMedium);
-        radioHigh = (RadioButton) findViewById(R.id.radioHigh);
+        editTextSubject = findViewById(R.id.editText);
+        editTextdate = findViewById(R.id.editTextDate);
+        editTextTime = findViewById(R.id.editTextTime);
+        actv = findViewById(R.id.autoCompleteTextView);
 
-        if(priority == 0){
+        radioGroup = findViewById(R.id.radioGroup);
+        radioLow = findViewById(R.id.radioLow);
+        radioMedium = findViewById(R.id.radioMedium);
+        radioHigh = findViewById(R.id.radioHigh);
+
+        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userId = currentFirebaseUser.getUid();
+        database = FirebaseDatabase.getInstance().getReference();
+        final List<String> tags = new ArrayList<>();
+        database.child("users").child(userId).child("tags").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                    String name = (String) snap.child("name").getValue();
+                    tags.add(name);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w("AddTaskActivity", "Failed to read value.", error.toException());
+            }
+        });
+
+        TagAdapter adapter = new TagAdapter(this, tags);
+        actv.setAdapter(adapter);
+        actv.setThreshold(1);
+
+        if (priority == 0) {
             radioLow.setChecked(true);
-        } else if (priority == 1){
+        } else if (priority == 1) {
             radioMedium.setChecked(true);
-        } else if (priority == 2){
+        } else if (priority == 2) {
             radioHigh.setChecked(true);
         }
 
-        if(date != 0){
+        if (date != 0) {
             Date d = new Date(date);
             Calendar cal = Calendar.getInstance();
             cal.setTime(d);

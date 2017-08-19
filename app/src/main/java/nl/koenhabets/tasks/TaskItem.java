@@ -2,11 +2,11 @@ package nl.koenhabets.tasks;
 
 
 public class TaskItem {
-    private String subject;
-    private long date;
-    private int priority;
-    private boolean completed;
-    private String id;
+    private final String subject;
+    private final long date;
+    private final int priority;
+    private final boolean completed;
+    private final String id;
 
     public TaskItem(String subject, long date, int priority, boolean completed, String id) {
         this.subject = subject;

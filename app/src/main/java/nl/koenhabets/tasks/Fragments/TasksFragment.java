@@ -29,21 +29,15 @@ import nl.koenhabets.tasks.TaskItem;
 import nl.koenhabets.tasks.adapters.TasksAdapter;
 
 public class TasksFragment extends Fragment {
-    ListView listView;
-    private List<TaskItem> taskItems = new ArrayList<>();
+    private ListView listView;
+    private final List<TaskItem> taskItems = new ArrayList<>();
     private TasksAdapter adapter;
-    int positionL;
-    DatabaseReference database;
-    String userId;
-    boolean showCompleted;
+    private int positionL;
+    private DatabaseReference database;
+    private String userId;
+    private boolean showCompleted;
 
     public TasksFragment() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -52,7 +46,7 @@ public class TasksFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
 
         adapter = new TasksAdapter(getContext(), taskItems);
-        listView = (ListView) rootView.findViewById(R.id.tasksListview);
+        listView = rootView.findViewById(R.id.tasksListview);
         listView.setAdapter(adapter);
 
         showCompleted = getArguments().getBoolean("showCompleted");
@@ -88,10 +82,10 @@ public class TasksFragment extends Fragment {
                     }
 
                     if (showCompleted && completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id);
                         taskItems.add(item);
                     } else if (!showCompleted && !completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, completed, id);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id);
                         taskItems.add(item);
                     }
                 }
@@ -107,7 +101,7 @@ public class TasksFragment extends Fragment {
         adapter.notifyDataSetChanged();
 
 
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fabAddTask);
+        FloatingActionButton fab = rootView.findViewById(R.id.fabAddTask);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

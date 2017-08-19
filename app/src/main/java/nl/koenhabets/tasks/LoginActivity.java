@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -27,34 +26,30 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 
 public class LoginActivity extends AppCompatActivity {
-    Button buttonBaseLogin;
-    Button buttonBaseRegister;
+    private Button buttonBaseLogin;
+    private Button buttonBaseRegister;
 
-    EditText textEmailLogin;
-    EditText textPasswordLogin;
-    Button buttonLoginAccount;
+    private EditText textEmailLogin;
+    private EditText textPasswordLogin;
+    private Button buttonLoginAccount;
 
-    EditText textEmailRegister;
-    EditText textPasswordRegister;
-    Button buttonRegisterAccount;
+    private EditText textEmailRegister;
+    private EditText textPasswordRegister;
+    private Button buttonRegisterAccount;
 
-    View contentLoginAccount;
-    View contentRegisterAccount;
-    View contentBase;
+    private View contentLoginAccount;
+    private View contentRegisterAccount;
+    private View contentBase;
 
     private FirebaseAuth mAuth;
-    boolean thing = false;
-    GoogleApiClient mGoogleApiClient;
-    SignInButton signInButton;
+    private boolean thing = false;
+    private GoogleApiClient mGoogleApiClient;
+    private SignInButton signInButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        contentLoginAccount = (View) findViewById(R.id.content_login_account);
-        contentRegisterAccount = (View) findViewById(R.id.content_register_account);
-        contentBase = (View) findViewById(R.id.content_login_base);
+    private void initViews() {
+        contentLoginAccount = findViewById(R.id.content_login_account);
+        contentRegisterAccount = findViewById(R.id.content_register_account);
+        contentBase = findViewById(R.id.content_login_base);
 
         contentLoginAccount.setVisibility(View.INVISIBLE);
         contentRegisterAccount.setVisibility(View.INVISIBLE);
@@ -70,6 +65,14 @@ public class LoginActivity extends AppCompatActivity {
         textEmailRegister = findViewById(R.id.textEmailRegister);
         textPasswordRegister = findViewById(R.id.textPasswordRegister);
         buttonRegisterAccount = findViewById(R.id.buttonRegisterAccount);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+       initViews();
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -140,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d("login", "createUserWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    Intent intent = new Intent(getApplicationContext(), DrawerActivity.class);
                                     startActivity(intent);
                                     finish();
                                 } else {

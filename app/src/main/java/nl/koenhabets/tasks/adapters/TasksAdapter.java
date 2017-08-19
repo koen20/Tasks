@@ -3,7 +3,6 @@ package nl.koenhabets.tasks.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,9 +44,9 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_item, parent, false);
         }
 
-        TextView textViewSubject = (TextView) convertView.findViewById(R.id.textViewSubject);
-        final CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
-        TextView textViewDate = (TextView) convertView.findViewById(R.id.textViewDate);
+        TextView textViewSubject = convertView.findViewById(R.id.textViewSubject);
+        final CheckBox checkBox = convertView.findViewById(R.id.checkBox);
+        TextView textViewDate = convertView.findViewById(R.id.textViewDate);
 
         if(ts != 0) {
             Date d = new Date(ts);
