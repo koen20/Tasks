@@ -29,16 +29,19 @@ public class DrawerActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        } catch (RuntimeException ignored) {
+        }
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser == null){
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        if (currentUser == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
