@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -190,6 +192,7 @@ public class AddTaskActivity extends AppCompatActivity {
             setResult(Activity.RESULT_OK, returnIntent);
             String tex = actv.getText() + "";
             String[] tagsSplit = tex.split(",");
+            JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < tagsSplit.length; ++i){
                 boolean ads = false;
                 for(String te : tags){
@@ -200,9 +203,10 @@ public class AddTaskActivity extends AppCompatActivity {
                 if(!ads){
                     DatabaseReference datas = database.child("users").child(userId).child("tags").push();
                     datas.child("name").setValue(tagsSplit[i].trim());
+                    jsonArray.put(datas.getParent().getKey());
                 }
             }
-            returnIntent.putExtra("tags", tex);
+            returnIntent.putExtra("tags", jsonArray.toString());
             finish();
             return true;
         } else if (id != null) {

@@ -20,6 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,11 +145,17 @@ public class TasksFragment extends Fragment {
         long ts = 0;
         int priority = 1;
         String tags = "";
+        JSONArray jsonArray = null;
         try {
             subject = data.getStringExtra("subject");
             ts = data.getLongExtra("date", 0);
             priority = data.getIntExtra("priority", 1);
             tags = data.getStringExtra("tags");
+            try {
+                jsonArray = new JSONArray(tags);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         } catch (NullPointerException ignored) {
         }
         if (subject != null) {
@@ -155,7 +164,7 @@ public class TasksFragment extends Fragment {
             datas.child("date").setValue(ts);
             datas.child("id").setValue(datas.getKey());
             datas.child("priority").setValue(priority);
-            datas.child("tags").setValue(tags);
+            datas.child("tags").setValue(jsonArray);
 
             TaskItem item = new TaskItem(subject, ts, priority, false, datas.getKey());
             taskItems.add(item);
