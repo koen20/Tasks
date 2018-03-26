@@ -1,4 +1,4 @@
-package nl.koenhabets.tasks;
+package nl.koenhabets.tasks.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import nl.koenhabets.tasks.Fragments.TasksFragment;
+import nl.koenhabets.tasks.R;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

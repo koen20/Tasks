@@ -1,4 +1,4 @@
-package nl.koenhabets.tasks;
+package nl.koenhabets.tasks.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import nl.koenhabets.tasks.R;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -203,8 +205,9 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
                 } else {
-                    // Google Sign In failed, update UI appropriately
-                    // ...
+                    Log.d("LoginActivity", "Google login failed");
+                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
                 }
             }catch (IllegalArgumentException e){e.printStackTrace();}
         }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0277BD"
-    tools:context="nl.koenhabets.tasks.LoginActivity">
+    tools:context="nl.koenhabets.tasks.activities.LoginActivity">
 
     <include
         android:id="@+id/content_login_base"
