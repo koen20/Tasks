@@ -190,7 +190,7 @@ public class TasksFragment extends Fragment {
                 }
             }
         } catch (JSONException ignored) {
-
+        } catch (NullPointerException ignored) {
         }
         return jsonArray;
     }
