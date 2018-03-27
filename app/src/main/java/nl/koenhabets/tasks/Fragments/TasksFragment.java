@@ -20,6 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,7 @@ public class TasksFragment extends Fragment {
     private DatabaseReference database;
     private String userId;
     private boolean showCompleted;
+    private JSONArray jsonArrayTags = new JSONArray();
 
     public TasksFragment() {
     }
@@ -55,6 +60,7 @@ public class TasksFragment extends Fragment {
         userId = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance().getReference();
+        getTags();
 
         database.child("users").child(userId).child("items").orderByChild("date").addValueEventListener(new ValueEventListener() {
             @Override
@@ -88,10 +94,10 @@ public class TasksFragment extends Fragment {
                     }
 
                     if (showCompleted && completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, tags);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, getJsonArrayTagsString(tags));
                         taskItems.add(item);
                     } else if (!showCompleted && !completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, tags);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, getJsonArrayTagsString(tags));
                         taskItems.add(item);
                     }
                 }
@@ -135,11 +141,57 @@ public class TasksFragment extends Fragment {
                 intent.putExtra("date", taskItems.get(pos).getDate());
                 intent.putExtra("priority", taskItems.get(pos).getPriority());
                 intent.putExtra("id", taskItems.get(pos).getId());
-                intent.putExtra("tags", taskItems.get(pos).getTags());
+                intent.putExtra("tags", taskItems.get(pos).getTags().toString());
                 startActivityForResult(intent, 989);
             }
         });
 
         return rootView;
+    }
+
+    private void getTags() {
+        database.child("users").child(userId).child("tags").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                    JSONObject jsonObject = new JSONObject();
+                    String name = (String) snap.child("name").getValue();
+                    String color = "";
+                    String id = snap.getKey();
+                    try {
+                        jsonObject.put("name", name);
+                        jsonObject.put("color", color);
+                        jsonObject.put("id", id);
+                        jsonArrayTags.put(jsonObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w("TasksFragment", "Failed to read tags.", error.toException());
+            }
+        });
+    }
+
+    private JSONArray getJsonArrayTagsString(String tags) {
+        JSONArray jsonArray = new JSONArray();
+        try {
+            JSONArray jsonArray1 = new JSONArray(tags);
+            for (int i = 0; i < jsonArray1.length(); ++i) {
+                for (int d = 0; d < jsonArrayTags.length(); ++d) {
+                    JSONObject tagItem = jsonArrayTags.getJSONObject(d);
+                    String id = tagItem.getString("id");
+                    if (id.equals(jsonArray1.getString(i))) {
+                        jsonArray.put(tagItem);
+                    }
+                }
+            }
+        } catch (JSONException ignored) {
+
+        }
+        return jsonArray;
     }
 }

@@ -19,6 +19,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +43,7 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         boolean isCompleted = taskItem.isCompleted();
         long ts = taskItem.getDate();
         final String id = taskItem.getId();
+        JSONArray tags = taskItem.getTags();
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_item, parent, false);
@@ -47,14 +52,15 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         TextView textViewSubject = convertView.findViewById(R.id.textViewSubject);
         final CheckBox checkBox = convertView.findViewById(R.id.checkBox);
         TextView textViewDate = convertView.findViewById(R.id.textViewDate);
+        TextView textViewTags = convertView.findViewById(R.id.textViewTags);
 
-        if(ts != 0) {
+        if (ts != 0) {
             Date d = new Date(ts);
             Calendar cal = Calendar.getInstance();
             long da = cal.getTimeInMillis();
             cal.setTime(d);
             textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
-            if(da > ts) {
+            if (da > ts) {
                 textViewDate.setTextColor(Color.parseColor("#F44336"));
             }
         }
@@ -62,13 +68,24 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         textViewSubject.setText(subject);
         checkBox.setChecked(isCompleted);
 
-        if (taskItem.getPriority() == 0){
+        if (taskItem.getPriority() == 0) {
             textViewSubject.setTextColor(Color.parseColor("#757575"));
-        } else if (taskItem.getPriority() == 1){
+        } else if (taskItem.getPriority() == 1) {
             textViewSubject.setTextColor(Color.parseColor("#FB8C00"));
-        } else if (taskItem.getPriority() == 2){
+        } else if (taskItem.getPriority() == 2) {
             textViewSubject.setTextColor(Color.parseColor("#F44336"));
         }
+        String tagsText = "";
+        for (int i = 0; i < tags.length(); ++i) {
+            try {
+                JSONObject jsonObject = tags.getJSONObject(i);
+                tagsText = tagsText + jsonObject.getString("name") + " ";
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        textViewTags.setText(tagsText);
 
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,15 +103,19 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
                         String key = snapshot.getRef().getKey();
                         database.child("users").child(userId).child("items").child(key).child("completed").setValue(isChecked);
                     }
+
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     }
+
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
                     }
+
                     @Override
                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }

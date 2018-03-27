@@ -1,15 +1,17 @@
 package nl.koenhabets.tasks;
 
 
+import org.json.JSONArray;
+
 public class TaskItem {
     private final String subject;
     private final long date;
     private final int priority;
     private final boolean completed;
     private final String id;
-    private final String tags;
+    private final JSONArray tags;
 
-    public TaskItem(String subject, long date, int priority, boolean completed, String id, String tags) {
+    public TaskItem(String subject, long date, int priority, boolean completed, String id, JSONArray tags) {
         this.subject = subject;
         this.date = date;
         this.priority = priority;
@@ -38,7 +40,7 @@ public class TaskItem {
         return id;
     }
 
-    public String getTags() {
+    public JSONArray getTags() {
         return tags;
     }
 }
