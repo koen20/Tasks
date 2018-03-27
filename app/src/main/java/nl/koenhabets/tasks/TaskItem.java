@@ -7,13 +7,15 @@ public class TaskItem {
     private final int priority;
     private final boolean completed;
     private final String id;
+    private final String tags;
 
-    public TaskItem(String subject, long date, int priority, boolean completed, String id) {
+    public TaskItem(String subject, long date, int priority, boolean completed, String id, String tags) {
         this.subject = subject;
         this.date = date;
         this.priority = priority;
         this.completed = completed;
         this.id = id;
+        this.tags = tags;
     }
 
     public String getSubject() {
@@ -34,5 +36,9 @@ public class TaskItem {
 
     public String getId() {
         return id;
+    }
+
+    public String getTags() {
+        return tags;
     }
 }

@@ -54,6 +54,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private String subject;
     private long date;
     private int priority;
+    private String tag;
     private String id;
     private RadioButton radioLow;
     private RadioButton radioMedium;
@@ -62,6 +63,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private List<String> tags = new ArrayList<>();
     String userId;
     JSONArray jsonArrayTags = new JSONArray();
+    String existingTags = "";
 
 
     @Override
@@ -74,6 +76,7 @@ public class AddTaskActivity extends AppCompatActivity {
         date = intent.getLongExtra("date", 0);
         priority = intent.getIntExtra("priority", 1);
         id = intent.getStringExtra("id");
+        tag = intent.getStringExtra("tags");
 
         editTextSubject = findViewById(R.id.editText);
         editTextdate = findViewById(R.id.editTextDate);
@@ -101,6 +104,21 @@ public class AddTaskActivity extends AppCompatActivity {
                         jsonArrayTags.put(jsonObject);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                }
+                for (int i = 0; i < jsonArrayTags.length(); ++i) {
+                    try {
+                        JSONArray jsonArray = new JSONArray(tag);
+                        JSONObject jsonObject = jsonArrayTags.getJSONObject(i);
+                        for (int d = 0; d < jsonArray.length(); ++d) {
+                            if (jsonObject.getString("id").equals(jsonArray.getString(d))) {
+                                existingTags = existingTags + jsonObject.getString("name") + ", ";
+                                actv.setText(existingTags);
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (NullPointerException ignored) {
                     }
                 }
             }
@@ -233,6 +251,7 @@ public class AddTaskActivity extends AppCompatActivity {
             database.child("subject").setValue(editTextSubject.getText().toString());
             database.child("priority").setValue(index);
             database.child("date").setValue(ts);
+            database.child("tags").setValue(jsonArray.toString());
             finish();
         }
         return super.onOptionsItemSelected(item);

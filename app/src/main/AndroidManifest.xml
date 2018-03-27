@@ -23,6 +23,7 @@
             android:name=".activities.LoginActivity"
             android:theme="@style/Login" />
         <activity android:name=".activities.AddTaskActivity" />
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
     </application>
 
 </manifest>

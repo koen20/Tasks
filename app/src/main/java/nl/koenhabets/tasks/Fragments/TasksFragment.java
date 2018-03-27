@@ -66,6 +66,7 @@ public class TasksFragment extends Fragment {
                     boolean completed = false;
                     long priority;
                     long date;
+                    String tags;
                     try {
                         completed = (Boolean) snap.child("completed").getValue();
                     } catch (NullPointerException ignored) {
@@ -80,12 +81,17 @@ public class TasksFragment extends Fragment {
                     } catch (NullPointerException ignored) {
                         date = 0;
                     }
+                    try {
+                        tags = (String) snap.child("tags").getValue();
+                    } catch (NullPointerException ignored) {
+                        tags = "";
+                    }
 
                     if (showCompleted && completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, tags);
                         taskItems.add(item);
                     } else if (!showCompleted && !completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id);
+                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, tags);
                         taskItems.add(item);
                     }
                 }
@@ -129,6 +135,7 @@ public class TasksFragment extends Fragment {
                 intent.putExtra("date", taskItems.get(pos).getDate());
                 intent.putExtra("priority", taskItems.get(pos).getPriority());
                 intent.putExtra("id", taskItems.get(pos).getId());
+                intent.putExtra("tags", taskItems.get(pos).getTags());
                 startActivityForResult(intent, 989);
             }
         });
