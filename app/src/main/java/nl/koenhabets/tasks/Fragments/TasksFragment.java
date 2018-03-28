@@ -21,16 +21,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.koenhabets.tasks.Data;
 import nl.koenhabets.tasks.activities.AddTaskActivity;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TaskItem;
 import nl.koenhabets.tasks.adapters.TasksAdapter;
+
+import static nl.koenhabets.tasks.Data.getTags;
 
 public class TasksFragment extends Fragment {
     private ListView listView;
@@ -60,7 +61,7 @@ public class TasksFragment extends Fragment {
         userId = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance().getReference();
-        getTags();
+        jsonArrayTags = getTags(database, userId);
 
         database.child("users").child(userId).child("items").orderByChild("date").addValueEventListener(new ValueEventListener() {
             @Override
@@ -94,10 +95,10 @@ public class TasksFragment extends Fragment {
                     }
 
                     if (showCompleted && completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, getJsonArrayTagsString(tags));
+                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, Data.getJsonArrayTagsString(tags, jsonArrayTags));
                         taskItems.add(item);
                     } else if (!showCompleted && !completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, getJsonArrayTagsString(tags));
+                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, Data.getJsonArrayTagsString(tags, jsonArrayTags));
                         taskItems.add(item);
                     }
                 }
@@ -147,51 +148,5 @@ public class TasksFragment extends Fragment {
         });
 
         return rootView;
-    }
-
-    private void getTags() {
-        database.child("users").child(userId).child("tags").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    JSONObject jsonObject = new JSONObject();
-                    String name = (String) snap.child("name").getValue();
-                    String color = "";
-                    String id = snap.getKey();
-                    try {
-                        jsonObject.put("name", name);
-                        jsonObject.put("color", color);
-                        jsonObject.put("id", id);
-                        jsonArrayTags.put(jsonObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                Log.w("TasksFragment", "Failed to read tags.", error.toException());
-            }
-        });
-    }
-
-    private JSONArray getJsonArrayTagsString(String tags) {
-        JSONArray jsonArray = new JSONArray();
-        try {
-            JSONArray jsonArray1 = new JSONArray(tags);
-            for (int i = 0; i < jsonArray1.length(); ++i) {
-                for (int d = 0; d < jsonArrayTags.length(); ++d) {
-                    JSONObject tagItem = jsonArrayTags.getJSONObject(d);
-                    String id = tagItem.getString("id");
-                    if (id.equals(jsonArray1.getString(i))) {
-                        jsonArray.put(tagItem);
-                    }
-                }
-            }
-        } catch (JSONException ignored) {
-        } catch (NullPointerException ignored) {
-        }
-        return jsonArray;
     }
 }

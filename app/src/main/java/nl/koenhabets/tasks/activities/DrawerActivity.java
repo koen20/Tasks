@@ -78,6 +78,11 @@ public class DrawerActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if(id == R.id.action_edit_tags){
+            Intent intent = new Intent(DrawerActivity.this, EditTagsActivity.class);
+            DrawerActivity.this.startActivity(intent);
+        }
+
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
 
     }

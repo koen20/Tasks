@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
@@ -37,7 +38,6 @@ import java.util.Objects;
 
 import nl.koenhabets.tasks.Data;
 import nl.koenhabets.tasks.R;
-import nl.koenhabets.tasks.adapters.TagAdapter;
 
 public class AddTaskActivity extends AppCompatActivity {
     private EditText editTextSubject;
@@ -129,7 +129,7 @@ public class AddTaskActivity extends AppCompatActivity {
             }
         });
 
-        TagAdapter adapter = new TagAdapter(this, tags);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.select_dialog_item, tags);
         actv.setAdapter(adapter);
         actv.setThreshold(1);
         actv.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
