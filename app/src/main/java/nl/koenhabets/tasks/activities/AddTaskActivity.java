@@ -88,6 +88,15 @@ public class AddTaskActivity extends AppCompatActivity {
         radioMedium = findViewById(R.id.radioMedium);
         radioHigh = findViewById(R.id.radioHigh);
 
+
+        if (date != 0) {
+            Date date2 = new Date(date);
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(date2);
+            editTextdate.setText(cal1.get(Calendar.DAY_OF_MONTH) + "-" + cal1.get(Calendar.DAY_OF_MONTH) + " " + cal1.get(Calendar.YEAR));
+            editTextTime.setText(cal1.get(Calendar.HOUR_OF_DAY) + ":" + cal1.get(Calendar.MINUTE));
+        }
+
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = currentFirebaseUser.getUid();
         database = FirebaseDatabase.getInstance().getReference();
@@ -111,8 +120,11 @@ public class AddTaskActivity extends AppCompatActivity {
                         JSONArray jsonArray = new JSONArray(tag);
                         JSONObject jsonObject = jsonArrayTags.getJSONObject(i);
                         for (int d = 0; d < jsonArray.length(); ++d) {
-                            if (jsonObject.getString("id").equals(jsonArray.getString(d))) {
+                            Log.i("1", jsonObject.getString("id"));
+                            Log.i("2", jsonArray.getString(d));
+                            if (jsonObject.getString("id").equals(jsonArray.getJSONObject(d).getString("id"))) {
                                 existingTags = existingTags + jsonObject.getString("name") + ", ";
+                                Log.i("existingtags", existingTags);
                                 actv.setText(existingTags);
                             }
                         }
@@ -142,13 +154,19 @@ public class AddTaskActivity extends AppCompatActivity {
             radioHigh.setChecked(true);
         }
 
+        Calendar cal54 = Calendar.getInstance();
         if (date != 0) {
             Date d = new Date(date);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(d);
-            editTextdate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + " " + cal.get(Calendar.YEAR));
-            editTextTime.setText(cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
+            cal54.setTime(d);
+            editTextdate.setText(cal54.get(Calendar.DAY_OF_MONTH) + "-" + cal54.get(Calendar.MONTH) + " " + cal54.get(Calendar.YEAR));
+            editTextTime.setText(cal54.get(Calendar.HOUR_OF_DAY) + ":" + cal54.get(Calendar.MINUTE));
         }
+
+        year = cal54.get(Calendar.YEAR);
+        month = cal54.get(Calendar.MONTH);
+        day = cal54.get(Calendar.DAY_OF_MONTH);
+        hour = cal54.get(Calendar.HOUR_OF_DAY);
+        minute = cal54.get(Calendar.MINUTE);
 
         editTextSubject.setText(subject);
 
@@ -170,10 +188,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Calendar cal = Calendar.getInstance();
-                new DatePickerDialog(AddTaskActivity.this, date, cal
-                        .get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH)).show();
+                new DatePickerDialog(AddTaskActivity.this, date, year, month, day).show();
             }
 
         });
@@ -195,9 +210,7 @@ public class AddTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Calendar cal = Calendar.getInstance();
-                new TimePickerDialog(AddTaskActivity.this, time, cal
-                        .get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-                        true).show();
+                new TimePickerDialog(AddTaskActivity.this, time, hour, minute, true).show();
             }
 
         });
