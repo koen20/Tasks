@@ -20,11 +20,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.koenhabets.tasks.Data;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TagItem;
 import nl.koenhabets.tasks.adapters.TagAdapter;
-import nl.koenhabets.tasks.adapters.TasksAdapter;
 
 public class EditTagsActivity extends AppCompatActivity {
     String userId;
@@ -62,7 +60,7 @@ public class EditTagsActivity extends AppCompatActivity {
                         jsonObject.put("name", name);
                         jsonObject.put("color", color);
                         jsonObject.put("id", id);
-                        TagItem tagItem = new TagItem(name, color);
+                        TagItem tagItem = new TagItem(name, color, id);
                         tagItems.add(tagItem);
                         jsonArray.put(jsonObject);
                     } catch (JSONException e) {

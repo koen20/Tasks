@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -25,6 +26,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +42,10 @@ import java.util.Objects;
 
 import nl.koenhabets.tasks.Data;
 import nl.koenhabets.tasks.R;
+import nl.koenhabets.tasks.ReminderItem;
+import nl.koenhabets.tasks.TagItem;
+import nl.koenhabets.tasks.TaskItem;
+import nl.koenhabets.tasks.adapters.ReminderAdapter;
 
 public class AddTaskActivity extends AppCompatActivity {
     private EditText editTextSubject;
@@ -51,32 +59,33 @@ public class AddTaskActivity extends AppCompatActivity {
     private int hour;
     private int minute;
     private long ts;
-    private String subject;
-    private long date;
-    private int priority;
     private String tag;
-    private String id;
     private RadioButton radioLow;
     private RadioButton radioMedium;
     private RadioButton radioHigh;
+    private ListView listView;
     private DatabaseReference database;
     private List<String> tags = new ArrayList<>();
     String userId;
     JSONArray jsonArrayTags = new JSONArray();
     String existingTags = "";
-
+    ReminderAdapter adapter;
+    private final List<ReminderItem> reminderItems = new ArrayList<>();
+    TaskItem taskItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+        taskItem = new TaskItem("", 0, 1, false, null, new ArrayList<TagItem>(), new ArrayList<ReminderItem>());
 
         Intent intent = getIntent();
-        subject = intent.getStringExtra("subject");
-        date = intent.getLongExtra("date", 0);
-        priority = intent.getIntExtra("priority", 1);
-        id = intent.getStringExtra("id");
-        tag = intent.getStringExtra("tags");
+        String task = intent.getStringExtra("task");
+        Gson gson = new Gson();
+        if(task != null) {
+            Log.i("ao9seidfhvdkjsajfnfhk", task);
+            taskItem = gson.fromJson(task, TaskItem.class);
+        }
 
         editTextSubject = findViewById(R.id.editText);
         editTextdate = findViewById(R.id.editTextDate);
@@ -88,9 +97,14 @@ public class AddTaskActivity extends AppCompatActivity {
         radioMedium = findViewById(R.id.radioMedium);
         radioHigh = findViewById(R.id.radioHigh);
 
+        listView = findViewById(R.id.listViewReminders);
+        adapter = new ReminderAdapter(this, reminderItems);
+        listView.setAdapter(adapter);
+        ReminderItem item22 = new ReminderItem("time", 0);
+        reminderItems.add(item22);
 
-        if (date != 0) {
-            Date date2 = new Date(date);
+        if (taskItem.getDate() != 0) {
+            Date date2 = new Date(taskItem.getDate());
             Calendar cal1 = Calendar.getInstance();
             cal1.setTime(date2);
             editTextdate.setText(cal1.get(Calendar.DAY_OF_MONTH) + "-" + cal1.get(Calendar.DAY_OF_MONTH) + " " + cal1.get(Calendar.YEAR));
@@ -146,17 +160,17 @@ public class AddTaskActivity extends AppCompatActivity {
         actv.setThreshold(1);
         actv.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
-        if (priority == 0) {
+        if (taskItem.getPriority() == 0) {
             radioLow.setChecked(true);
-        } else if (priority == 1) {
+        } else if (taskItem.getPriority() == 1) {
             radioMedium.setChecked(true);
-        } else if (priority == 2) {
+        } else if (taskItem.getPriority() == 2) {
             radioHigh.setChecked(true);
         }
 
         Calendar cal54 = Calendar.getInstance();
-        if (date != 0) {
-            Date d = new Date(date);
+        if (taskItem.getDate() != 0) {
+            Date d = new Date(taskItem.getDate());
             cal54.setTime(d);
             editTextdate.setText(cal54.get(Calendar.DAY_OF_MONTH) + "-" + cal54.get(Calendar.MONTH) + " " + cal54.get(Calendar.YEAR));
             editTextTime.setText(cal54.get(Calendar.HOUR_OF_DAY) + ":" + cal54.get(Calendar.MINUTE));
@@ -168,7 +182,7 @@ public class AddTaskActivity extends AppCompatActivity {
         hour = cal54.get(Calendar.HOUR_OF_DAY);
         minute = cal54.get(Calendar.MINUTE);
 
-        editTextSubject.setText(subject);
+        editTextSubject.setText(taskItem.getSubject());
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -233,7 +247,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
         String tex = actv.getText().toString();
         final String[] tagsSplit = tex.split(",");
-        JSONArray jsonArray = new JSONArray();
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < tagsSplit.length; ++i) {
             boolean existing = false;
             for (int d = 0; d < jsonArrayTags.length(); ++d) {
@@ -241,7 +255,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     JSONObject jsonObject = jsonArrayTags.getJSONObject(d);
                     if (Objects.equals(jsonObject.getString("name"), tagsSplit[i].trim())) {
                         existing = true;
-                        jsonArray.put(jsonObject.getString("id"));
+                        stringList.add(jsonObject.getString("id"));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -251,20 +265,21 @@ public class AddTaskActivity extends AppCompatActivity {
             if (!existing && !Objects.equals(tagsSplit[i].trim(), "")) {
                 DatabaseReference datas = database.child("users").child(userId).child("tags").push();
                 datas.child("name").setValue(tagsSplit[i].trim());
-                jsonArray.put(datas.getKey());
+                stringList.add(datas.getKey());
             }
         }
 
-        if (idd == R.id.action_add && id == null) {
-            Log.i("taaaa", jsonArray.toString());
-            Data.newTask(userId, FirebaseDatabase.getInstance().getReference(), subject, ts, index, jsonArray);
+        if (idd == R.id.action_add && taskItem.getId() == null) {
+            Log.i("taaaa", stringList.toString());
+            Log.i("tsadd", ts + "");
+            Data.newTask(userId, FirebaseDatabase.getInstance().getReference(), subject, ts, index, stringList);
             finish();
-        } else if (id != null) {
-            DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("items").child(id);
+        } else if (taskItem.getId() != null) {
+            DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users").child(userId).child("items").child(taskItem.getId());
             database.child("subject").setValue(editTextSubject.getText().toString());
             database.child("priority").setValue(index);
             database.child("date").setValue(ts);
-            database.child("tags").setValue(jsonArray.toString());
+            database.child("tags").setValue(stringList);
             finish();
         }
         return super.onOptionsItemSelected(item);

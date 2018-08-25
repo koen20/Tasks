@@ -3,21 +3,25 @@ package nl.koenhabets.tasks;
 
 import org.json.JSONArray;
 
+import java.util.List;
+
 public class TaskItem {
     private final String subject;
     private final long date;
     private final int priority;
     private final boolean completed;
     private final String id;
-    private final JSONArray tags;
+    private final List<TagItem> tags;
+    private final List<ReminderItem> reminders;
 
-    public TaskItem(String subject, long date, int priority, boolean completed, String id, JSONArray tags) {
+    public TaskItem(String subject, long date, int priority, boolean completed, String id, List<TagItem> tags, List<ReminderItem> reminders) {
         this.subject = subject;
         this.date = date;
         this.priority = priority;
         this.completed = completed;
         this.id = id;
         this.tags = tags;
+        this.reminders = reminders;
     }
 
     public String getSubject() {
@@ -40,7 +44,11 @@ public class TaskItem {
         return id;
     }
 
-    public JSONArray getTags() {
+    public List<TagItem> getTags() {
         return tags;
+    }
+
+    public List<ReminderItem> getReminders() {
+        return reminders;
     }
 }

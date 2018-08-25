@@ -3,6 +3,7 @@ package nl.koenhabets.tasks.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import nl.koenhabets.tasks.R;
+import nl.koenhabets.tasks.TagItem;
 import nl.koenhabets.tasks.TaskItem;
 
 public class TasksAdapter extends ArrayAdapter<TaskItem> {
@@ -43,7 +44,7 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         boolean isCompleted = taskItem.isCompleted();
         long ts = taskItem.getDate();
         final String id = taskItem.getId();
-        JSONArray tags = taskItem.getTags();
+        List<TagItem> tags = taskItem.getTags();
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_item, parent, false);
@@ -55,12 +56,15 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         TextView textViewTags = convertView.findViewById(R.id.textViewTags);
 
         if (ts != 0) {
-            Date d = new Date(ts);
             Calendar cal = Calendar.getInstance();
             long da = cal.getTimeInMillis();
-            cal.setTime(d);
+            cal.setTimeInMillis(ts);
             textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
-            if (da > ts) {
+            Log.i("subject", subject);
+            Log.i("da", da + "");
+            Log.i("ts", ts + "");
+            if (da > ts) {///todo fix timestamp wrong month
+                Log.i("task", "task over time");
                 textViewDate.setTextColor(Color.parseColor("#F44336"));
             }
         }
@@ -75,14 +79,11 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
         } else if (taskItem.getPriority() == 2) {
             textViewSubject.setTextColor(Color.parseColor("#F44336"));
         }
+
         String tagsText = "";
-        for (int i = 0; i < tags.length(); ++i) {
-            try {
-                JSONObject jsonObject = tags.getJSONObject(i);
-                tagsText = tagsText + jsonObject.getString("name") + " ";
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        for (int i = 0; i < tags.size(); ++i) {
+            TagItem item = tags.get(i);
+            tagsText = tagsText + item.getName() + " ";
         }
 
         textViewTags.setText(tagsText);

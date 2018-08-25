@@ -8,38 +8,32 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Data {
 
-    public static void newTask(String userId,  DatabaseReference database, String subject, long ts, int priority, JSONArray jsonArray){
+    public static void newTask(String userId, DatabaseReference database, String subject, long ts, int priority, List<String> jsonArray) {
         DatabaseReference datas = database.child("users").child(userId).child("items").push();
         datas.child("subject").setValue(subject);
         datas.child("date").setValue(ts);
         datas.child("id").setValue(datas.getKey());
         datas.child("priority").setValue(priority);
-        datas.child("tags").setValue(jsonArray.toString());
+        datas.child("tags").setValue(jsonArray);
     }
 
-    public static JSONArray getTags(DatabaseReference database, String userId) {
-        final JSONArray jsonArray = new JSONArray();
+    public static List<TagItem> getTags(DatabaseReference database, String userId) {
+        final List<TagItem> tagItemList = new ArrayList<>();
         database.child("users").child(userId).child("tags").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    JSONObject jsonObject = new JSONObject();
                     String name = (String) snap.child("name").getValue();
                     String color = "";
                     String id = snap.getKey();
-                    try {
-                        jsonObject.put("name", name);
-                        jsonObject.put("color", color);
-                        jsonObject.put("id", id);
-                        jsonArray.put(jsonObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    TagItem tagItem = new TagItem(name, color, id);
+                    tagItemList.add(tagItem);
                 }
             }
 
@@ -48,24 +42,22 @@ public class Data {
                 Log.w("TasksFragment", "Failed to read tags.", error.toException());
             }
         });
-        return jsonArray;
+        return tagItemList;
     }
 
-    public static JSONArray getJsonArrayTagsString(String tags, JSONArray jsonArrayTags) {
-        JSONArray jsonArray = new JSONArray();
+    public static List<TagItem> getListTagsString(List<String> tags, List<TagItem> tagItemList) {
+        List<TagItem> tagItemListNew = new ArrayList<>();
         try {
-            JSONArray jsonArray1 = new JSONArray(tags);
-            for (int i = 0; i < jsonArray1.length(); ++i) {
-                for (int d = 0; d < jsonArrayTags.length(); ++d) {
-                    JSONObject tagItem = jsonArrayTags.getJSONObject(d);
-                    String id = tagItem.getString("id");
-                    if (id.equals(jsonArray1.getString(i))) {
-                        jsonArray.put(tagItem);
+            for (int i = 0; i < tags.size(); ++i) {
+                for (int d = 0; d < tagItemList.size(); ++d) {
+                    String id = tagItemList.get(d).getId();
+                    if (id.equals(tags.get(i))) {
+                        tagItemListNew.add(tagItemList.get(d));
                     }
                 }
             }
-        } catch (JSONException | NullPointerException ignored) {
+        } catch (NullPointerException ignored) {
         }
-        return jsonArray;
+        return tagItemListNew;
     }
 }

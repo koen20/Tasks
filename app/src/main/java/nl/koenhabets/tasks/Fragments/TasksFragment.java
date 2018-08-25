@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 import org.json.JSONArray;
 
@@ -26,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.koenhabets.tasks.Data;
+import nl.koenhabets.tasks.ReminderItem;
+import nl.koenhabets.tasks.TagItem;
 import nl.koenhabets.tasks.activities.AddTaskActivity;
 import nl.koenhabets.tasks.R;
 import nl.koenhabets.tasks.TaskItem;
@@ -41,7 +46,7 @@ public class TasksFragment extends Fragment {
     private DatabaseReference database;
     private String userId;
     private boolean showCompleted;
-    private JSONArray jsonArrayTags = new JSONArray();
+    private List<TagItem> tagItemList = new ArrayList<>();
 
     public TasksFragment() {
     }
@@ -61,7 +66,7 @@ public class TasksFragment extends Fragment {
         userId = currentFirebaseUser.getUid();
 
         database = FirebaseDatabase.getInstance().getReference();
-        jsonArrayTags = getTags(database, userId);
+        tagItemList = getTags(database, userId);
 
         database.child("users").child(userId).child("items").orderByChild("date").addValueEventListener(new ValueEventListener() {
             @Override
@@ -73,7 +78,8 @@ public class TasksFragment extends Fragment {
                     boolean completed = false;
                     long priority;
                     long date;
-                    String tags;
+                    List<String> tags = new ArrayList<>();
+                    List<ReminderItem> reminders = new ArrayList<>();
                     try {
                         completed = (Boolean) snap.child("completed").getValue();
                     } catch (NullPointerException ignored) {
@@ -89,16 +95,20 @@ public class TasksFragment extends Fragment {
                         date = 0;
                     }
                     try {
-                        tags = (String) snap.child("tags").getValue();
-                    } catch (NullPointerException ignored) {
-                        tags = "";
+                        tags = (List<String>) snap.child("tags").getValue();
+                    } catch (ClassCastException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        reminders = (List<ReminderItem>) snap.child("reminders").getValue();
+                    } catch (ClassCastException ignored) {
                     }
 
                     if (showCompleted && completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, Data.getJsonArrayTagsString(tags, jsonArrayTags));
+                        TaskItem item = new TaskItem(subject, date, (int) priority, true, id, Data.getListTagsString(tags, tagItemList), reminders);
                         taskItems.add(item);
                     } else if (!showCompleted && !completed) {
-                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, Data.getJsonArrayTagsString(tags, jsonArrayTags));
+                        TaskItem item = new TaskItem(subject, date, (int) priority, false, id, Data.getListTagsString(tags, tagItemList), reminders);
                         taskItems.add(item);
                     }
                 }
@@ -138,11 +148,8 @@ public class TasksFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
                 Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-                intent.putExtra("subject", taskItems.get(pos).getSubject());
-                intent.putExtra("date", taskItems.get(pos).getDate());
-                intent.putExtra("priority", taskItems.get(pos).getPriority());
-                intent.putExtra("id", taskItems.get(pos).getId());
-                intent.putExtra("tags", taskItems.get(pos).getTags().toString());
+                Gson gson = new Gson();
+                intent.putExtra("task", gson.toJson(taskItems.get(pos)));
                 startActivityForResult(intent, 989);
             }
         });
