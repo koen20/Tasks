@@ -20,10 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -59,11 +55,11 @@ public class TasksAdapter extends ArrayAdapter<TaskItem> {
             Calendar cal = Calendar.getInstance();
             long da = cal.getTimeInMillis();
             cal.setTimeInMillis(ts);
-            textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
+            textViewDate.setText(cal.get(Calendar.DAY_OF_MONTH) + "-" + (cal.get(Calendar.MONTH) + 1)  + "-" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE));
             Log.i("subject", subject);
             Log.i("da", da + "");
             Log.i("ts", ts + "");
-            if (da > ts) {///todo fix timestamp wrong month
+            if (da > ts) {
                 Log.i("task", "task over time");
                 textViewDate.setTextColor(Color.parseColor("#F44336"));
             }

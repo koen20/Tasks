@@ -1,8 +1,5 @@
 package nl.koenhabets.tasks;
 
-
-import org.json.JSONArray;
-
 import java.util.List;
 
 public class TaskItem {

@@ -27,8 +27,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,7 +81,6 @@ public class AddTaskActivity extends AppCompatActivity {
         String task = intent.getStringExtra("task");
         Gson gson = new Gson();
         if(task != null) {
-            Log.i("ao9seidfhvdkjsajfnfhk", task);
             taskItem = gson.fromJson(task, TaskItem.class);
         }
 
@@ -190,7 +187,7 @@ public class AddTaskActivity extends AppCompatActivity {
             public void onDateSet(DatePicker view, int ye, int mo,
                                   int da) {
                 year = ye;
-                month = mo + 1;
+                month = mo;
                 day = da;
                 editTextdate.setText(day + "-" + month + " " + year);
                 ts();
@@ -238,6 +235,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.i("maand", "" + month);
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final String userId = currentFirebaseUser.getUid();
         final int idd = item.getItemId();

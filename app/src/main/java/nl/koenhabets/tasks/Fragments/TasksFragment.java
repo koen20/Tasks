@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,32 +72,26 @@ public class TasksFragment extends Fragment {
                     String subject = (String) snap.child("subject").getValue();
                     String id = (String) snap.child("id").getValue();
                     boolean completed = false;
-                    long priority;
+                    long priority = 1;
                     long date;
                     List<String> tags = new ArrayList<>();
                     List<ReminderItem> reminders = new ArrayList<>();
-                    try {
+                    if (snap.hasChild("completed")) {
                         completed = (Boolean) snap.child("completed").getValue();
-                    } catch (NullPointerException ignored) {
                     }
-                    try {
+                    if (snap.hasChild("priority")) {
                         priority = (long) snap.child("priority").getValue();
-                    } catch (NullPointerException ignored) {
-                        priority = 1;
                     }
                     try {
                         date = (long) snap.child("date").getValue();
                     } catch (NullPointerException ignored) {
                         date = 0;
                     }
-                    try {
+                    if (snap.hasChild("tags")) {
                         tags = (List<String>) snap.child("tags").getValue();
-                    } catch (ClassCastException e) {
-                        e.printStackTrace();
                     }
-                    try {
+                    if (snap.hasChild("reminders")) {
                         reminders = (List<ReminderItem>) snap.child("reminders").getValue();
-                    } catch (ClassCastException ignored) {
                     }
 
                     if (showCompleted && completed) {
@@ -122,7 +112,6 @@ public class TasksFragment extends Fragment {
         });
 
         adapter.notifyDataSetChanged();
-
 
         FloatingActionButton fab = rootView.findViewById(R.id.fabAddTask);
         fab.setOnClickListener(new View.OnClickListener() {
